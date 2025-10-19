@@ -23,9 +23,14 @@ export async function submitScore(lastGameData, onSuccess, onError) {
         if (userRecords && userRecords.length > 0) {
             const userRecord = userRecords[0];
             const updatedScores = [...(userRecord.scores || []), lastGameData];
-            await room.collection('leaderboard_scores_v1').update(userRecord.id, { scores: updatedScores });
+            await room.collection('leaderboard_scores_v1').update(userRecord.id, { 
+                scores: updatedScores,
+                avatar_url: currentUser.avatar_url // Also update avatar URL in case it changed
+            });
         } else {
             await room.collection('leaderboard_scores_v1').create({
+                username: currentUser.username,
+                avatar_url: currentUser.avatar_url,
                 scores: [lastGameData]
             });
         }
@@ -67,6 +72,7 @@ export async function fetchLeaderboard() {
         
         return {
             username: record.username,
+            avatar_url: record.avatar_url || `https://images.websim.com/avatar/${record.username}`, // Use saved URL, with fallback
             highestScore: bestGame ? bestGame.score : 0,
             gamesPlayed: record.scores.length,
             bestGameData: bestGame,
@@ -94,7 +100,7 @@ export function renderLeaderboard(rankedPlayers) {
             <div class="leaderboard-entry-wrapper">
                 <div class="leaderboard-entry" data-index="${index}">
                     <div class="rank">${index + 1}</div>
-                    <img class="avatar" src="https://images.websim.com/avatar/${player.username}" alt="${player.username}'s avatar">
+                    <img class="avatar" src="${player.avatar_url}" alt="${player.username}'s avatar">
                     <div class="user-info">
                         <div class="username">${player.username}</div>
                         <div class="games-played">${player.gamesPlayed} ${player.gamesPlayed === 1 ? 'game' : 'games'}</div>

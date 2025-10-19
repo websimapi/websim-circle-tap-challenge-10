@@ -137,7 +137,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (!replayData.config.currentUser) {
                     replayData.config.currentUser = {
                         username: playerData.username,
-                        avatar_url: `https://images.websim.com/avatar/${playerData.username}`
+                        avatar_url: playerData.avatar_url
                     };
                 }
 
